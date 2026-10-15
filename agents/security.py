@@ -1,19 +1,17 @@
-"""Revisor de seguridad: edita aquí el rol, el objetivo y las instrucciones de su tarea."""
+"""Revisor de seguridad: ajusta el objetivo y las instrucciones de tu agente básico."""
 
 from crewai import Agent, Task
 from crew.llm_config import llm
 
-KEY = "security"
-LABEL = "Revisor de seguridad"
-SPEC_FILE = "security_report.md"
+KEY = 'security'
+LABEL = 'Revisor de seguridad'
+SPEC_FILE = 'security_report.md'
 EXTRACT_CODE = False
+
 agent = Agent(
-    role="Security Reviewer",
-    goal="Revisar la seguridad de la solución y registrar hallazgos verificables.",
-    backstory=(
-        "Eres un revisor de seguridad de aplicaciones bancarias. Identificas riesgos en el código\n"
-        "recibido, sin atribuir certificaciones ni resultados de herramientas que no ejecutaste."
-    ),
+    role='Security',
+    goal='Revisar la entrada y los secretos del cambio.',
+    backstory='Revisas el código recibido y señalas riesgos concretos.',
     llm=llm,
     verbose=True,
     allow_delegation=False,
@@ -23,22 +21,17 @@ agent = Agent(
 def build_task(feature: dict) -> Task:
     title = feature.get("title", "(sin título)")
     description = feature.get("description", "")
-    ac_text = (
-        "\n".join((f"  - {c}" for c in feature.get("acceptance_criteria", [])))
-        or description
-    )
-    feature_brief = (
-        f"Feature: {title}\n\n{description}\n\nCriterios de aceptación:\n{ac_text}"
-    )
+    criteria = "\n".join(f"- {item}" for item in feature.get("acceptance_criteria", []))
     return Task(
         description=(
-            "Revisa las especificaciones, backend, frontend y pruebas aprobadas del feature.\n"
-            "Inspecciona autenticación, autorización, validación de entradas, inyección, manejo de\n"
-            "secretos, datos personales, errores y logs. Para cada hallazgo indica archivo, evidencia,\n"
-            "severidad, corrección y prueba de verificación. Separa riesgos confirmados de\n"
-            "verificaciones pendientes. No modifiques código. No declares pruebas ejecutadas."
-        )
-        + feature_brief,
-        expected_output="Informe de seguridad con hallazgos, severidad, evidencia y verificaciones pendientes.",
+            f"Feature: {title}\n{description}\nCriterios de aceptación:\n{criteria}\n\n"
+            'Revisa la validación del lado servidor y los secretos en las entregas anteriores. Si '
+            'cambia autenticación o autorización, revisa también esos controles. Por cada hallazgo '
+            'cita archivo, evidencia y corrección. Si no ves hallazgos, indica qué revisaste. Señala '
+            'las verificaciones pendientes. No cambies código ni afirmes haber ejecutado pruebas.'
+        ),
+        expected_output=(
+            'Lista breve de hallazgos o comprobaciones, con evidencia y pendientes.'
+        ),
         agent=agent,
     )

@@ -29,6 +29,9 @@ class WorkflowTests(unittest.TestCase):
         for role in ROLES:
             self.assertIs(tasks[role.KEY].agent, role.agent)
             self.assertIn("Transfer funds", tasks[role.KEY].description)
+            self.assertIn(FEATURE["description"], tasks[role.KEY].description)
+            for criterion in FEATURE["acceptance_criteria"]:
+                self.assertIn(criterion, tasks[role.KEY].description)
             self.assertTrue(Path(role.__file__).is_file())
 
     def test_pipeline_saves_all_roles_and_resumes(self):
