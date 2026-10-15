@@ -2,23 +2,23 @@
 
 ## Crear el repositorio del equipo
 
-Una persona crea el repo desde esta plantilla. Sustituye `equipo-01` por el nombre acordado:
+El capitán crea el repositorio en su cuenta personal desde esta plantilla:
 
 ```sh
-gh repo create NTTData-Academy/crewai-equipo-01 --template NTTData-Academy/crewai --private --clone
+gh repo create crewai --template NTTData-Academy/crewai --private --clone
 ```
 
 Agrega a tus compañeros como colaboradores con permiso de escritura en el repo del equipo.
 Los demás integrantes clonan ese mismo repo:
 
 ```sh
-gh repo clone NTTData-Academy/crewai-equipo-01
-cd crewai-equipo-01
+gh repo clone <CAPTAIN>/crewai
+cd crewai
 ```
 
 ## Repartir los archivos
 
-Anota un responsable por archivo. Si hay menos de seis personas, una persona puede tomar varios roles.
+Anota un responsable por archivo. El equipo tiene seis personas y cada una edita su propio agente.
 
 - `agents/architect.py`: responsable pendiente. Define la solución y el contrato de API.
 - `agents/backend.py`: responsable pendiente. Implementa el backend.
@@ -27,13 +27,17 @@ Anota un responsable por archivo. Si hay menos de seis personas, una persona pue
 - `agents/security.py`: responsable pendiente. Revisa riesgos y propone correcciones verificables.
 - `agents/chapter.py`: responsable pendiente. Revisa todas las entregas y emite el veredicto final.
 
+## Registrar responsables para el dashboard
+
+Copia `team.example.json` a `team.json`, reemplaza los seis valores por usuarios reales de GitHub distintos y publica ese archivo en `main`. El dashboard lee `roles` para asociar cada agente con su responsable. Los nombres de ejemplo no son participantes.
+
 ## Entregar un cambio
 
 1. Acuerden un requerimiento y sus criterios de aceptación.
 2. Crea tu rama, por ejemplo `git switch -c agents/backend`.
 3. Edita las instrucciones de tu agente en su archivo. Coordina los cambios de contratos con el arquitecto.
 4. Ejecuta `python tools/verify.py`.
-5. Publica tu rama y abre un PR hacia el repo de tu equipo.
+5. Publica tu rama y abre un PR hacia `main` del repo del capitán. No envíes el PR al template de la organización.
 6. Pide a un compañero que revise el cambio antes de integrarlo.
 
 Una persona ejecuta el pipeline integrado desde `main`. El equipo participa en las aprobaciones
