@@ -52,9 +52,17 @@ y `PROJECTS_MCP_API_KEY`. Estos valores apuntan al servicio MCP del taller.
 El repo del producto contiene el backlog; este repo contiene el código del Crew.
 
 Si usas el MCP local del Lab 4, levántalo en otra terminal desde
-`bcp-ai-lab-day-04/00_support/mcp-local` con los scripts `start-mcp.ps1` o `start-mcp.sh`.
-Ese servicio requiere la imagen MCP preparada en el taller y Podman o Docker.
-La URL de S1 es `http://localhost:8081`. Mantén esa terminal abierta durante la ejecución.
+`support/mcp-local` con los scripts `start-mcp.ps1` o `start-mcp.sh`.
+Ese servicio requiere la imagen `localhost/mcp-github-project-manager:latest`, preparada por el instructor, y Podman o Docker. Si no tienes esa imagen, solicita al instructor un endpoint MCP del taller.
+En macOS o Linux:
+
+```sh
+cd support/mcp-local
+gh auth refresh -s project
+bash start-mcp.sh --owner TU_OWNER --repo TU_PRODUCTO
+```
+
+En PowerShell, ejecuta `./start-mcp.ps1 -Owner TU_OWNER -Repo TU_PRODUCTO` desde esa misma carpeta. Mantén esa terminal abierta y ejecuta `python main.py` en otra terminal desde la raíz del repo. La URL de S1 es `http://localhost:8081`.
 
 ## Ejecutar el Crew
 
