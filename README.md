@@ -22,23 +22,20 @@ Consulta [TEAM.md](TEAM.md) para crear el repo de tu equipo y repartir los archi
 ## Preparar el entorno
 
 Requiere Python 3.11 a 3.13, Git y acceso a GitHub Copilot.
-Usa Python 3.12 durante el taller. En PowerShell:
+Usa Python 3.12 durante el taller y ejecuta los comandos en Bash. En Windows, abre Git Bash.
 
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-```
-
-En macOS o Linux:
-
-```sh
-python3.12 -m venv .venv
-source .venv/bin/activate
+```bash
+python -m venv .venv
+if [ -f .venv/Scripts/activate ]; then
+  source .venv/Scripts/activate
+else
+  source .venv/bin/activate
+fi
 python -m pip install -r requirements.txt
 [ -f .env ] || cp .env.example .env
 ```
+
+Si en macOS o Linux tu instalación se llama `python3.12`, úsala para crear el entorno. Una vez activado, ejecuta `python`.
 
 Instala [Copilot CLI](https://github.com/features/copilot/cli), abre `copilot` y ejecuta `/login`.
 El SDK usa esa sesión con `COPILOT_USE_LOGGED_IN_USER=true`.
@@ -52,7 +49,7 @@ y `PROJECTS_MCP_API_KEY`. Estos valores apuntan al servicio MCP del taller.
 El repo del producto contiene el backlog; este repo contiene el código del Crew.
 
 Si usas el MCP local del Lab 4, levántalo en otra terminal desde
-`support/mcp-local` con los scripts `start-mcp.ps1` o `start-mcp.sh`.
+`support/mcp-local` con el script `start-mcp.sh`.
 Ese servicio requiere la imagen `localhost/mcp-github-project-manager:latest`, preparada por el instructor, y Podman o Docker. Si no tienes esa imagen, solicita al instructor un endpoint MCP del taller.
 En macOS o Linux:
 
@@ -62,7 +59,7 @@ gh auth refresh -s project
 bash start-mcp.sh --owner TU_OWNER --repo TU_PRODUCTO
 ```
 
-En PowerShell, ejecuta `./start-mcp.ps1 -Owner TU_OWNER -Repo TU_PRODUCTO` desde esa misma carpeta. Mantén esa terminal abierta y ejecuta `python main.py` en otra terminal desde la raíz del repo. La URL de S1 es `http://localhost:8081`.
+Mantén esa terminal Bash abierta y ejecuta `python main.py` en otra terminal desde la raíz del repo. La URL de S1 es `http://localhost:8081`.
 
 ## Ejecutar el Crew
 
