@@ -1,5 +1,7 @@
 # CrewAI para equipos
 
+Los agentes parten con instrucciones básicas. Sigue [Mejora tu agente](MEJORA_TU_AGENTE.md) para completar el ejercicio y consultar resultados desde el portal.
+
 Base de trabajo del Lab 4, S1. Lee una funcionalidad del backlog mediante MCP Projects
 y genera una solución Quarkus 3.x y Angular 17 con seis agentes de CrewAI.
 Cada agente tiene su definición y la tarea en un archivo propio.
