@@ -8,6 +8,13 @@ Cada agente tiene su definición y la tarea en un archivo propio.
 
 ## Editar tu agente
 
+Los agentes son básicos: un objetivo breve, una responsabilidad por rol y una salida concreta.
+Usa un requisito pequeño, por ejemplo crear una tarea con título.
+Ajusta ese ejemplo al requisito del backlog de tu equipo.
+Testing propone un caso válido y otro inválido; Security revisa entradas y secretos;
+Chapter compara las entregas con el requisito. Los prompts conservan los formatos
+que necesita el flujo para guardar código y revisar resultados.
+
 Cada participante edita el archivo de su rol:
 
 - `agents/architect.py`
