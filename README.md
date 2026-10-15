@@ -1,0 +1,110 @@
+# CrewAI para equipos
+
+Base de trabajo del Lab 4, S1. Lee una funcionalidad del backlog mediante MCP Projects
+y genera una solución Quarkus 3.x y Angular 17 con seis agentes de CrewAI.
+Cada agente tiene su definición y la tarea en un archivo propio.
+
+## Editar tu agente
+
+Cada participante edita el archivo de su rol:
+
+- `agents/architect.py`
+- `agents/backend.py`
+- `agents/frontend.py`
+- `agents/testing.py`
+- `agents/security.py`
+- `agents/chapter.py`
+
+El orden es `architect → backend → frontend → testing → security → chapter`.
+Chapter reemplaza al LT como revisor final. La aprobación humana se conserva entre etapas.
+Consulta [TEAM.md](TEAM.md) para crear el repo de tu equipo y repartir los archivos.
+
+## Preparar el entorno
+
+Requiere Python 3.11 a 3.13, Git y acceso a GitHub Copilot.
+Usa Python 3.12 durante el taller. En PowerShell:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+```
+
+En macOS o Linux:
+
+```sh
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+[ -f .env ] || cp .env.example .env
+```
+
+Instala [Copilot CLI](https://github.com/features/copilot/cli), abre `copilot` y ejecuta `/login`.
+El SDK usa esa sesión con `COPILOT_USE_LOGGED_IN_USER=true`.
+El modelo predeterminado es `gpt-6-luna` con esfuerzo `high`. Cada llamada consume uso del plan de Copilot.
+Puedes descargar su runtime antes del taller con `python -m copilot download-runtime`.
+
+## Conectar el backlog
+
+Configura `.env` con el owner y repo del producto de tu equipo, `PROJECTS_MCP_URL`
+y `PROJECTS_MCP_API_KEY`. Estos valores apuntan al servicio MCP del taller.
+El repo del producto contiene el backlog; este repo contiene el código del Crew.
+
+Si usas el MCP local del Lab 4, levántalo en otra terminal desde
+`bcp-ai-lab-day-04/00_support/mcp-local` con los scripts `start-mcp.ps1` o `start-mcp.sh`.
+Ese servicio requiere la imagen MCP preparada en el taller y Podman o Docker.
+La URL de S1 es `http://localhost:8081`. Mantén esa terminal abierta durante la ejecución.
+
+## Ejecutar el Crew
+
+Desde la raíz de este repo, con el entorno virtual activado:
+
+```sh
+python main.py
+```
+
+Selecciona el proyecto y la funcionalidad. Cada paso ejecuta un mini-Crew de un agente.
+En la aprobación humana puedes usar `s` para aprobar, `r` para reintentar con feedback,
+o `n` para rechazar y detener el flujo. El checkpoint permite retomar los pasos aprobados.
+
+Los artefactos se guardan en `output/`:
+
+- `specs/user_story.md`: especificación del arquitecto.
+- `specs/backend_spec.md` y `specs/frontend_spec.md`: implementaciones.
+- `specs/testing_report.md`: casos, tests y comandos. Los resultados quedan pendientes de ejecución humana.
+- `specs/security_report.md`: hallazgos y verificaciones de seguridad.
+- `specs/chapter_review.md`: revisión final del Chapter.
+- `backend-quarkus/` y `frontend-angular/`: código extraído y configuración de arranque.
+- `.checkpoint.json`: estado local de la ejecución.
+
+## Probar la solución generada
+
+Con Java 17 o superior y Maven instalados, abre una terminal en `output/backend-quarkus`:
+
+```sh
+mvn test
+mvn compile quarkus:dev
+```
+
+Con Node.js 18.19 o superior y npm, abre otra terminal en `output/frontend-angular`:
+
+```sh
+npm install
+npm start
+```
+
+La API se inicia en `http://localhost:8080` y Angular en `http://localhost:4200`.
+Revisa los comandos adicionales del informe de pruebas y registra sus resultados reales.
+
+## Verificar cambios en los agentes
+
+```sh
+python tools/verify.py
+```
+
+Los checks recorren los seis roles, verifican artefactos, contexto y reanudación.
+Sustituyen las llamadas al modelo y a MCP para ejecutarse sin credenciales.
+La ejecución real de Copilot y MCP requiere el entorno del taller.
+
+Consulta [SOURCE.md](SOURCE.md) para ver el origen de esta copia.
