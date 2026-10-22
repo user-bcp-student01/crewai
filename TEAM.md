@@ -18,7 +18,7 @@ cd crewai
 
 ## Repartir los archivos
 
-Anota un responsable por archivo. El equipo tiene seis personas y cada una edita su propio agente.
+Anota un responsable por archivo. Cada persona edita su propio agente. Consulta la tabla de responsabilidades, entregables y puntos de partida en [Mejora tu agente](MEJORA_TU_AGENTE.md#de-dónde-partir-según-tu-rol). Solo el equipo de siete añade Datos y persistencia.
 
 - `agents/architect.py`: responsable pendiente. Define la solución y el contrato de API.
 - `agents/backend.py`: responsable pendiente. Implementa el backend.
