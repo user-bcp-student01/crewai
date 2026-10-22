@@ -46,3 +46,21 @@ y entorno virtual. No compartan checkpoints entre ejecuciones de distintas compu
 
 Los agentes generan texto y archivos. El agente de pruebas propone tests y comandos;
 una persona los ejecuta y adjunta la salida real al PR. Un informe del modelo no demuestra que las pruebas pasaron.
+
+## Equipo de siete (solo CrewAI)
+
+El grupo de siete añade un responsable de **Datos y persistencia**, que edita
+únicamente `agents/data.py` y entrega su propio PR. Los equipos de seis mantienen
+sus seis roles. En `team.json`, solo el equipo de siete añade `"data": "usuario-real"`
+dentro de `roles`, con un usuario distinto de los otros responsables.
+
+Antes de iniciar un flujo nuevo, el líder del equipo de siete configura
+`CREWAI_INCLUDE_DATA=true` en su `.env`. El orden será Arquitectura → Datos y
+persistencia → Backend → Frontend → Pruebas → Seguridad → Chapter. Cada etapa
+mantiene aprobación, rechazo y reintento humanos. Datos produce `output/specs/data_spec.md`
+y propuestas SQL en `output/db/`; no ejecuta migraciones. Backend usa ese contrato
+y Chapter lo revisa. Los participantes mejoran las instrucciones iniciales de su agente.
+
+Por defecto la variable es `false`. Un checkpoint de seis etapas no se reutiliza
+en el flujo de siete ni viceversa: conserva la carpeta `output/` con otro nombre
+antes de cambiar el modo. No borres evidencia previa para cambiar de flujo.

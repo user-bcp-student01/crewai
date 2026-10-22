@@ -60,7 +60,7 @@ import textwrap
 from pathlib import Path
 from crewai import Crew, Process
 
-from crew.workflow import STEPS, build_tasks
+from crew.workflow import build_tasks, include_data, workflow_steps
 from agents.architect import agent as architect_agent
 
 # ── MCP clients ────────────────────────────────────────────────────
@@ -848,7 +848,7 @@ def _ctx_snippet(text: str, max_chars: int = 8000) -> str:
 def build_context_note(approved_outputs: dict) -> str:
     """Construye una nota de contexto con los outputs aprobados anteriores."""
     parts = []
-    labels = {key: label for key, label, *_ in STEPS}
+    labels = {key: label for key, label, *_ in workflow_steps(True)}
     for key, label in labels.items():
         if key in approved_outputs:
             val = str(getattr(approved_outputs[key], "raw", approved_outputs[key]) or "")
@@ -864,6 +864,8 @@ def build_context_note(approved_outputs: dict) -> str:
 # ═══════════════════════════════════════════════════════════════════
 
 def main():
+    with_data = include_data()
+    steps = workflow_steps(with_data)
     # ── MCP Proyectos: descubrir tools ────────────────────────────────
     print("\n[MCP Proyectos] Autenticando...")
     _proj_tools = proj_tools()
@@ -934,6 +936,12 @@ def main():
             print("Abortando. Cambia de feature o elimina output/.checkpoint.json para reiniciar.")
             raise SystemExit(0)
 
+    mode = "with-data" if with_data else "standard"
+    previous_mode = checkpoint.get("workflow_mode", "standard")
+    if steps_state and previous_mode != mode:
+        print("El checkpoint pertenece a otro flujo. Conserva output/ moviéndolo a otra carpeta antes de cambiar CREWAI_INCLUDE_DATA.")
+        raise SystemExit(1)
+    checkpoint["workflow_mode"] = mode
     checkpoint["feature_title"] = feature["title"]
 
     # ── Recuperar outputs aprobados del checkpoint ────────────────────
@@ -958,11 +966,11 @@ def main():
 
     print("\n" + "=" * 60)
     print(f"S1 CrewAI — HITL — Feature: {feature['title']}")
-    print("Pasos: Arquitecto → Backend → Frontend → Pruebas → Seguridad → Chapter")
+    print("Pasos: " + " → ".join(step[1] for step in steps))
     print("=" * 60)
 
     # ── Loop HITL ─────────────────────────────────────────────────────
-    for step_key, step_label, agent, spec_file, do_code in STEPS:
+    for step_key, step_label, agent, spec_file, do_code in steps:
 
         # ── Ya aprobado en ejecución anterior → omitir ───────────────
         if steps_state.get(step_key, {}).get("status") == "approved":
@@ -981,13 +989,18 @@ def main():
         user_feedback = ""
         while True:
             # Rebuild tasks fresh en cada intento
-            task_map = build_tasks(feature)
+            task_map = build_tasks(feature, with_data)
             task = task_map[step_key]
 
             # Inyectar contexto de pasos anteriores en la descripción
             ctx_note = build_context_note(approved_outputs)
             if ctx_note:
                 task.description = task.description + ctx_note
+
+            if with_data and step_key == "backend":
+                task.description += "\nUsa el diseño de persistencia aprobado de Datos y persistencia. No regeneres sus archivos SQL; implementa el acceso a datos según ese contrato."
+            if with_data and step_key == "chapter":
+                task.description += "\nRevisa también el modelo, migración y compatibilidad del contrato aprobado de Datos y persistencia con backend."
 
             # Si el usuario ingresó feedback opcional en un reintento, inyectarlo como directiva prioritaria
             if user_feedback:
@@ -1037,7 +1050,7 @@ def main():
     print("\n" + "=" * 60)
     print("✅ TODOS LOS PASOS APROBADOS")
     print("=" * 60)
-    print("  output/specs/            → user_story.md · backend_spec.md · frontend_spec.md · testing_report.md · security_report.md · chapter_review.md")
+    print("  output/specs/            → " + " · ".join(step[3] for step in steps))
     print("  output/backend-quarkus/  → archivos .java extraídos")
     print("  output/frontend-angular/ → archivos .ts/.html extraídos")
     print("  output/db/               → .sql extraídos")

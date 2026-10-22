@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 import main as app
-from crew.workflow import ROLES, STEPS, build_tasks
+from crew.workflow import ROLES, STEPS, DATA_ROLES, build_tasks, workflow_steps, include_data
 
 
 FEATURE = {
@@ -35,11 +35,29 @@ class WorkflowTests(unittest.TestCase):
             self.assertTrue(Path(role.__file__).is_file())
 
     def test_pipeline_saves_all_roles_and_resumes(self):
+        self.check_pipeline(False)
+
+    def test_seven_role_pipeline_saves_sql_passes_context_and_resumes(self):
+        self.check_pipeline(True)
+
+    def test_invalid_activation_is_rejected(self):
+        with patch.dict("os.environ", {"CREWAI_INCLUDE_DATA": "maybe"}):
+            with self.assertRaises(ValueError):
+                include_data()
+
+    def test_data_retry_rejection_and_resume_keep_human_gate(self):
+        self.check_pipeline(True, interrupt_data=True)
+
+    def check_pipeline(self, with_data, interrupt_data=False):
+        roles = DATA_ROLES if with_data else ROLES
+        steps = workflow_steps(with_data)
         calls = []
 
         def run(agent, task):
-            key = next(role.KEY for role in ROLES if role.agent is agent)
+            key = next(role.KEY for role in roles if role.agent is agent)
             calls.append((key, task.description))
+            if key == "data":
+                return "Approved data contract.\n```sql\n-- migration.sql\nCREATE TABLE accounts (id INTEGER PRIMARY KEY);\n```"
             if key == "backend":
                 return "```java\n// BalanceService.java\npackage pe.bcp.login.service;\npublic class BalanceService {}\n```"
             if key == "frontend":
@@ -49,6 +67,7 @@ class WorkflowTests(unittest.TestCase):
             return f"Approved output from {key}. No model was called."
 
         with tempfile.TemporaryDirectory() as tmp, contextlib.ExitStack() as stack:
+            stack.enter_context(patch.dict("os.environ", {"CREWAI_INCLUDE_DATA": str(with_data).lower()}))
             output = Path(tmp)
             stack.enter_context(patch.object(app, "OUTPUT_DIR", output))
             stack.enter_context(
@@ -73,15 +92,32 @@ class WorkflowTests(unittest.TestCase):
                 patch.object(app, "get_feature_from_item", return_value=FEATURE)
             )
             stack.enter_context(patch.object(app, "run_step", side_effect=run))
-            stack.enter_context(
-                patch.object(app, "hitl_approve", return_value=("s", ""))
-            )
+            data_decisions = iter([("r", "Add a uniqueness constraint"), ("n", "")])
+            def approve(label, result):
+                if interrupt_data and label == "Datos y persistencia":
+                    decision = next(data_decisions, ("s", ""))
+                    if decision[0] != "s":
+                        self.assertFalse((output / "specs/data_spec.md").exists())
+                        self.assertFalse((output / "db/migration.sql").exists())
+                    return decision
+                return "s", ""
+            stack.enter_context(patch.object(app, "hitl_approve", side_effect=approve))
             stack.enter_context(patch("builtins.input", return_value="1"))
             stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+            if interrupt_data:
+                with self.assertRaises(SystemExit):
+                    app.main()
+                rejected = json.loads((output / ".checkpoint.json").read_text())
+                self.assertEqual(rejected["steps"]["data"]["status"], "rejected")
+                self.assertNotIn("backend", rejected["steps"])
+                self.assertIn("Add a uniqueness constraint", calls[2][1])
             app.main()
 
-            self.assertEqual([key for key, _ in calls], [role.KEY for role in ROLES])
-            for key, _, _, spec, _ in STEPS:
+            expected = [role.KEY for role in roles]
+            if interrupt_data:
+                expected[1:2] = ["data", "data", "data"]
+            self.assertEqual([key for key, _ in calls], expected)
+            for key, _, _, spec, _ in steps:
                 self.assertTrue((output / "specs" / spec).is_file(), key)
             self.assertTrue(
                 (
@@ -93,7 +129,12 @@ class WorkflowTests(unittest.TestCase):
             self.assertIn("Coverage report", chapter_prompt)
             self.assertIn("Approved output from security", chapter_prompt)
             checkpoint = json.loads((output / ".checkpoint.json").read_text())
-            self.assertEqual(len(checkpoint["steps"]), 6)
+            self.assertEqual(len(checkpoint["steps"]), len(roles))
+            if with_data:
+                self.assertEqual(list(dict.fromkeys(key for key, _ in calls))[:3], ["architect", "data", "backend"])
+                self.assertIn("Approved data contract", next(prompt for key, prompt in calls if key == "backend"))
+                self.assertIn("Approved data contract", chapter_prompt)
+                self.assertTrue((output / "db/migration.sql").is_file())
             self.assertTrue(
                 all(
                     step["status"] == "approved"
@@ -103,8 +144,14 @@ class WorkflowTests(unittest.TestCase):
 
             app.main()
             self.assertEqual(
-                len(calls), 6, "Approved steps must not call the model again"
+                len(calls), len(expected), "Approved steps must not call the model again"
             )
+            before = (output / ".checkpoint.json").read_text()
+            with patch.dict("os.environ", {"CREWAI_INCLUDE_DATA": str(not with_data).lower()}):
+                with self.assertRaises(SystemExit) as stopped:
+                    app.main()
+                self.assertEqual(stopped.exception.code, 1)
+            self.assertEqual((output / ".checkpoint.json").read_text(), before)
 
 
 if __name__ == "__main__":
