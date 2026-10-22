@@ -3,7 +3,7 @@
 Los agentes parten con instrucciones básicas. Sigue [Mejora tu agente](MEJORA_TU_AGENTE.md) para completar el ejercicio y consultar resultados desde el portal.
 
 Base de trabajo del Lab 4, S1. Lee una funcionalidad del backlog mediante MCP Projects
-y genera una solución Quarkus 3.x y Angular 17 con seis agentes de CrewAI.
+y genera una solución Quarkus 3.x y Angular 17 con seis agentes de CrewAI, o siete cuando el equipo activa Datos y persistencia.
 Cada agente tiene su definición y la tarea en un archivo propio.
 
 ## Editar tu agente
@@ -122,3 +122,21 @@ Sustituyen las llamadas al modelo y a MCP para ejecutarse sin credenciales.
 La ejecución real de Copilot y MCP requiere el entorno del taller.
 
 Consulta [SOURCE.md](SOURCE.md) para ver el origen de esta copia.
+
+## Equipo de siete (solo CrewAI)
+
+El grupo de siete añade un responsable de **Datos y persistencia**, que edita
+únicamente `agents/data.py` y entrega su propio PR. Los equipos de seis mantienen
+sus seis roles. En `team.json`, solo el equipo de siete añade `"data": "usuario-real"`
+dentro de `roles`, con un usuario distinto de los otros responsables.
+
+Antes de iniciar un flujo nuevo, el líder del equipo de siete configura
+`CREWAI_INCLUDE_DATA=true` en su `.env`. El orden será Arquitectura → Datos y
+persistencia → Backend → Frontend → Pruebas → Seguridad → Chapter. Cada etapa
+mantiene aprobación, rechazo y reintento humanos. Datos produce `output/specs/data_spec.md`
+y propuestas SQL en `output/db/`; no ejecuta migraciones. Backend usa ese contrato
+y Chapter lo revisa. Los participantes mejoran las instrucciones iniciales de su agente.
+
+Por defecto la variable es `false`. Un checkpoint de seis etapas no se reutiliza
+en el flujo de siete ni viceversa: conserva la carpeta `output/` con otro nombre
+antes de cambiar el modo. No borres evidencia previa para cambiar de flujo.
