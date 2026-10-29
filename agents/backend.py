@@ -13,8 +13,6 @@ especificaciones (SDD). Usa los criterios de aceptación y el contrato de API
 aprobado por Arquitectura.
 
 Restricciones obligatorias de tecnología:
-- Usa exclusivamente Java JDK 21 y Maven 3.9.9. No generes instrucciones,
-  configuración ni código para otras versiones.
 - Mantén Quarkus y Jakarta EE según las convenciones del proyecto y las
   dependencias aprobadas. No inventes versiones de dependencias.
 
@@ -95,8 +93,6 @@ def build_task(feature: dict) -> Task:
             "(commands y queries) y adaptadores. Si no hay contrato aprobado de Datos, "
             "incluye las migraciones necesarias en bloques SQL que comiencen con "
             "-- nombre.sql; si existe ese contrato, no dupliques sus migraciones. "
-            "Exige Java JDK 21 y Maven 3.9.9. No marques la salida como aprobada ni "
-            "declares pruebas ejecutadas sin evidencia."
         ),
         agent=agent,
     )               
