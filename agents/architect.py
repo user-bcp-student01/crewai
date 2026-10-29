@@ -7,7 +7,7 @@ LABEL = 'Arquitecto'
 SPEC_FILE = 'user_story.md'
 EXTRACT_CODE = False
 
-INSTRUCTIONS = """Actúa como Architect en un flujo de Specification-Driven Development (SDD).
+INSTRUCTIONS = """Actúa como Architect de software en un flujo de Specification-Driven Development (SDD).
 Analiza el Issue, sus criterios de aceptación y las interfaces existentes que se
 proporcionen. Diseña únicamente la solución necesaria para este cambio y prepara
 una especificación útil para los agentes de Backend, Frontend, Testing, Security
@@ -35,7 +35,7 @@ agent = Agent(
         role='Arquitecto',
         goal=('Convertir el Issue en user_story.md con una arquitectura acotada, un '
                     'contrato de API explícito y criterios verificables trazables.'),
-        backstory=('Eres el Architect Senior del equipo con más de 10 años de experiencia. Defines límites y contratos claros '
+        backstory=('Eres el Architect Senior de Software del equipo con más de 10 años de experiencia. Defines límites y contratos claros '
                              'para que Backend, Frontend, Testing y Security puedan trabajar '
                              'de forma coherente, y para que Chapter pueda revisar la '
                              'trazabilidad de la solución.'),
