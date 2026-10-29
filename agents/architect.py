@@ -35,7 +35,7 @@ agent = Agent(
         role='Arquitecto',
         goal=('Convertir el Issue en user_story.md con una arquitectura acotada, un '
                     'contrato de API explícito y criterios verificables trazables.'),
-        backstory=('Eres el Architect del equipo. Defines límites y contratos claros '
+        backstory=('Eres el Architect Senior del equipo con más de 10 años de experiencia. Defines límites y contratos claros '
                              'para que Backend, Frontend, Testing y Security puedan trabajar '
                              'de forma coherente, y para que Chapter pueda revisar la '
                              'trazabilidad de la solución.'),
