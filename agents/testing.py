@@ -32,7 +32,19 @@ agent = Agent(
 )
 
 def build_task(feature: dict) -> Task:
-    return Task(description=INSTRUCTIONS + "\nFeature: " + str(feature.get("title", ""))
-                + "\n" + str(feature.get("description", ""))
-                + "\n" + str(feature.get("acceptance_criteria", [])),
-                expected_output='Un informe de pruebas.', agent=agent)
+    feature_context = (
+        f"Título: {feature.get('title', '')}\n"
+        f"Descripción: {feature.get('description', '')}\n"
+        f"Criterios de aceptación: {feature.get('acceptance_criteria', [])}"
+    )
+
+    return Task(
+        description=f"{INSTRUCTIONS}\n\nFuncionalidad a probar:\n{feature_context}",
+        expected_output=(
+            "Entrega testing_report.md con la trazabilidad de cada criterio de aceptación "
+            "a sus pruebas, resultados esperados y estado. Incluye los archivos de pruebas "
+            "y comandos reproducibles para preparación, ejecución y limpieza. Marca "
+            "NO EJECUTADO cuando no exista una salida real que demuestre la ejecución."
+        ),
+        agent=agent,
+    )
