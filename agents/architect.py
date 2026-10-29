@@ -46,20 +46,9 @@ agent = Agent(
 
 
 def build_task(feature: dict) -> Task:
-    criteria = feature.get("acceptance_criteria", [])
-    criteria_text = "\n".join(f"- {criterion}" for criterion in criteria)
-    interfaces = (feature.get("product_interfaces") or feature.get("interfaces")
-                  or "No se proporcionaron interfaces existentes del producto.")
-    description = (
-        f"{INSTRUCTIONS}\n"
-        f"## Issue\nTítulo: {feature.get('title', '')}\n\n"
-        f"Descripción:\n{feature.get('description', '')}\n\n"
-        f"## Criterios de aceptación\n"
-        f"{criteria_text or '- No se proporcionaron criterios de aceptación.'}\n\n"
-        f"## Interfaces existentes del producto\n{interfaces}"
-    )
-    return Task(
-        description=description,
+    return Task(description=INSTRUCTIONS + "\nFeature: " + str(feature.get("title", ""))
+                + "\n" + str(feature.get("description", ""))
+                + "\n" + str(feature.get("acceptance_criteria", [])),
         expected_output=(
             "Contenido de user_story.md con alcance, componentes y límites, "
             "recorrido de petición, contrato de API con ejemplos, trazabilidad "
