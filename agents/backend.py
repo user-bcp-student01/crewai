@@ -3,7 +3,7 @@ from crewai import Agent, Task
 from crew.llm_config import llm
 
 KEY = 'backend'
-LABEL = 'Desarrollador backend senior Java / Quarkus / Jakarta EE'
+LABEL = 'Desarrollador backend senior Java'
 SPEC_FILE = 'backend_spec.md'
 EXTRACT_CODE = True
 
@@ -59,7 +59,7 @@ una corrección.
 """
 
 agent = Agent(
-    role='Desarrollador backend senior especialista en Java, Quarkus y Jakarta EE',
+    role='Desarrollador backend senior especialista en Java',
     goal=(
         'Implementar el backend del Issue asignado conforme al contrato aprobado, '
         'los criterios de aceptación y las convenciones del proyecto.'
