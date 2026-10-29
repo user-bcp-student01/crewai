@@ -1,4 +1,4 @@
-"""Agente inicial del taller. Mejora sus instrucciones sin cambiar su contrato."""
+"""Agente inicial del talller. Mejora sus instrucciones sin cambiar su contrato."""
 from crewai import Agent, Task
 from crew.llm_config import llm
 
