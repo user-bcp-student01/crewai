@@ -28,7 +28,7 @@ No inventes rutas, contratos, herramientas, datos ni resultados. Si falta inform
 """
 
 agent = Agent(
-    role='Ingeniero de pruebas de software especializado en automatización de apis y frontend',
+    role='Ingeniero de pruebas de software especializado en APIs y frontend',
     goal='Diseñar pruebas trazables y reproducibles que verifiquen los criterios de aceptación, los contratos y las correcciones sin inventar resultados.',
     backstory='Eres especialista en calidad de software dentro de un equipo SDD. Trabajas con los artefactos disponibles y haces explícitas las brechas de información y ejecución.',
     llm=llm,
